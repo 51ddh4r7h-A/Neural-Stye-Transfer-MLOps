@@ -6,10 +6,24 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchvision.models import vgg16
 from torchvision.models.feature_extraction import create_feature_extractor
+import matplotlib.pyplot as plt
 
 from configs import config
 from models import StyleTransferNetwork, calc_content_loss, calc_style_loss, calc_tv_loss
 from utils import ImageDataset, DataProcessor, imsave
+
+def plot_losses(losses):
+    """Plot loss graphs."""
+    plt.figure(figsize=(10, 5))
+    plt.plot(losses['content'], label='Content Loss')
+    plt.plot(losses['style'], label='Style Loss')
+    plt.plot(losses['tv'], label='TV Loss')
+    plt.plot(losses['total'], label='Total Loss')
+    plt.xlabel('Iterations')
+    plt.ylabel('Loss')
+    plt.title('Losses Over Training')
+    plt.legend()
+    plt.show()
 
 def train(args):
     """Train Network."""
@@ -93,6 +107,7 @@ def train(args):
                 log += f", {k}: {avg:1.4f}"
             print(log)
 
+    plot_losses(losses)
     torch.save({"state_dict": model.state_dict()}, args.checkpoint_path)
 
 
