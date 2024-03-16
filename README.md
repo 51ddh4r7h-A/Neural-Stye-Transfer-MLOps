@@ -7,6 +7,7 @@
 ``` python evaluate.py --content_path "./imgs/gentlecat.png" --style_index -1 --output_path stylized.png ```
 
 ### For training
+    - Download the content dataset first
     - Content Images dataset: https://www.kaggle.com/datasets/adityajn105/flickr8k/
     - Style Images are already Provided in imgs/styles
 
