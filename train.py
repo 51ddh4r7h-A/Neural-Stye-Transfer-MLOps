@@ -8,9 +8,11 @@ from torchvision.models import vgg16
 from torchvision.models.feature_extraction import create_feature_extractor
 import matplotlib.pyplot as plt
 
+from pathlib import Path
 from configs import config
 from models import StyleTransferNetwork, calc_content_loss, calc_style_loss, calc_tv_loss
-from utils import ImageDataset, DataProcessor, imsave
+from utils.data_utils import ImageDataset, DataProcessor
+from utils.image_utils import imsave
 
 def plot_losses(losses):
     """Plot loss graphs."""
@@ -27,11 +29,11 @@ def plot_losses(losses):
 
 def train(args):
     """Train Network."""
-    device = torch.device('cuda')
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     # data
-    content_dataset = ImageDataset(dir_path=args.content_path)
-    style_dataset = ImageDataset(dir_path=args.style_path)
+    content_dataset = ImageDataset(dir_path=Path(args.content_path))
+    style_dataset = ImageDataset(dir_path=Path(args.style_path))
 
     data_processor = DataProcessor(imsize=args.imsize,
                                    cropsize=args.cropsize,
