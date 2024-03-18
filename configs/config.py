@@ -20,3 +20,4 @@ RETURN_NODES = {3: 'relu_1_2',
                 8: 'relu_2_2',
                 15: 'relu_3_3',
                 22: 'relu_4_2'}
+MODEL_PATH = 'modelv2.ckpt'
