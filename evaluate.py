@@ -46,7 +46,7 @@ if __name__ == '__main__':
                         help='Input image size')
 
     # Other configurations
-    parser.add_argument('--checkpoint_path', type=str, default='model.ckpt',
+    parser.add_argument('--checkpoint_path', type=str, default='modelv2.ckpt',
                         help='Path to the trained model checkpoint')
     parser.add_argument('--output_path', type=str, default='stylized_image.jpg',
                         help='Path to save the stylized image')
