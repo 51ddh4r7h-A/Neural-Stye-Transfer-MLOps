@@ -1,3 +1,5 @@
+"""Training Script."""
+
 import argparse
 import torch
 from torch.optim import Adam
@@ -5,8 +7,6 @@ from torch.utils.data import DataLoader
 from torchvision.models import vgg16
 from torchvision.models.feature_extraction import create_feature_extractor
 import matplotlib.pyplot as plt
-import mlflow
-import dagshub
 
 from pathlib import Path
 from configs import config
@@ -30,14 +30,6 @@ def plot_losses(losses):
 def train(args):
     """Train Network."""
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
-    # Initialize MLflow
-    mlflow.set_tracking_uri('https://dagshub.com/musical-octo-dollop/shatter-star/')
-    mlflow.set_experiment('style_transfer_experiment')
-    mlflow.start_run()
-
-    # Log parameters
-    mlflow.log_params(vars(args))
 
     # data
     content_dataset = ImageDataset(dir_path=Path(args.content_path))
@@ -118,15 +110,8 @@ def train(args):
             print(log)
 
     plot_losses(losses)
-    # Save model checkpoint
-    checkpoint_path = args.checkpoint_path
-    torch.save({"state_dict": model.state_dict()}, checkpoint_path)
+    torch.save({"state_dict": model.state_dict()}, args.checkpoint_path)
 
-    # Log artifacts
-    mlflow.log_artifact(checkpoint_path)
-
-    # End MLflow run
-    mlflow.end_run()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
