@@ -1,6 +1,7 @@
 """Training Script."""
 
 import argparse
+import os
 import torch
 from torch.optim import Adam
 from torch.utils.data import DataLoader
@@ -36,10 +37,12 @@ def train(args):
 
     # Set up MLflow
     mlflow.set_tracking_uri("https://dagshub.com/shatter-star/musical-octo-dollop.mlflow")
-    mlflow.set_tracking_username("shatter-star")
-    mlflow.set_tracking_password("411996890a0df0c0ccf65dbd848d454f40ad3cbb")
+    os.environ["MLFLOW_TRACKING_USERNAME"] = "shatter-star"
+    os.environ["MLFLOW_TRACKING_PASSWORD"] = "411996890a0df0c0ccf65dbd848d454f40ad3cbb"
+    mlflow_client = MlflowClient()
+
     experiment_name = "StyleTransferExperiment"
-    mlflow.set_experiment(experiment_name)
+    experiment_id = mlflow_client.create_experiment(experiment_name)
 
     # data
     content_dataset = ImageDataset(dir_path=Path(args.content_path))
@@ -73,7 +76,7 @@ def train(args):
     losses = {'content': [], 'style': [], 'tv': [], 'total': []}
     print("Start training...")
 
-    with mlflow.start_run():
+    with mlflow.start_run(experiment_id=experiment_id, run_name="StyleTransferRun"):
         # Log parameters
         mlflow.log_params({
             "style_weight": args.style_weight,
