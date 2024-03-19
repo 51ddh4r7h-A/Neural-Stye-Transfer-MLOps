@@ -42,7 +42,12 @@ def train(args):
     mlflow_client = MlflowClient()
 
     experiment_name = "StyleTransferExperiment"
-    experiment_id = mlflow_client.create_experiment(experiment_name)
+    experiment = mlflow_client.get_experiment_by_name(experiment_name)
+
+    if experiment:
+        experiment_id = experiment.experiment_id
+    else:
+        experiment_id = mlflow_client.create_experiment(experiment_name)
 
     # data
     content_dataset = ImageDataset(dir_path=Path(args.content_path))
