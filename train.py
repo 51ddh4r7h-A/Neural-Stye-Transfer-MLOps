@@ -8,6 +8,9 @@ from torchvision.models import vgg16
 from torchvision.models.feature_extraction import create_feature_extractor
 import matplotlib.pyplot as plt
 
+import mlflow
+from mlflow.tracking import MlflowClient
+
 from pathlib import Path
 from configs import config
 from models import StyleTransferNetwork, calc_content_loss, calc_style_loss, calc_tv_loss
@@ -30,6 +33,13 @@ def plot_losses(losses):
 def train(args):
     """Train Network."""
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
+    # Set up MLflow
+    mlflow.set_tracking_uri("https://dagshub.com/shatter-star/musical-octo-dollop.mlflow")
+    mlflow.set_tracking_username("shatter-star")
+    mlflow.set_tracking_password("411996890a0df0c0ccf65dbd848d454f40ad3cbb")
+    experiment_name = "StyleTransferExperiment"
+    mlflow.set_experiment(experiment_name)
 
     # data
     content_dataset = ImageDataset(dir_path=Path(args.content_path))
@@ -62,54 +72,80 @@ def train(args):
 
     losses = {'content': [], 'style': [], 'tv': [], 'total': []}
     print("Start training...")
-    for i in range(1, 1+args.iterations):
-        content_images, _ = next(iter(content_dataloader))
-        style_images, style_indices = next(iter(style_dataloader))
 
-        style_codes = torch.zeros(args.batch_size, config.NUM_STYLE, 1)
-        for b, s in enumerate(style_indices):
-            style_codes[b, s] = 1
+    with mlflow.start_run():
+        # Log parameters
+        mlflow.log_params({
+            "style_weight": args.style_weight,
+            "tv_weight": args.tv_weight,
+            "learning_rate": args.learning_rate,
+            "batch_size": args.batch_size,
+            "iterations": args.iterations,
+            # ... (add other relevant parameters)
+        })
 
-        content_images = content_images.to(device)
-        style_images = style_images.to(device)
-        style_codes = style_codes.to(device)
+        for i in range(1, 1+args.iterations):
+            content_images, _ = next(iter(content_dataloader))
+            style_images, style_indices = next(iter(style_dataloader))
 
-        output_images = model(content_images, style_codes)
+            style_codes = torch.zeros(args.batch_size, config.NUM_STYLE, 1)
+            for b, s in enumerate(style_indices):
+                style_codes[b, s] = 1
 
-        content_features = loss_network(content_images)
-        style_features = loss_network(style_images)
-        output_features = loss_network(output_images)
+            content_images = content_images.to(device)
+            style_images = style_images.to(device)
+            style_codes = style_codes.to(device)
 
-        style_loss = calc_style_loss(output_features,
-                                     style_features,
-                                     config.STYLE_NODES)
-        content_loss = calc_content_loss(output_features,
-                                         content_features,
-                                         config.CONTENT_NODES)
-        tv_loss = calc_tv_loss(output_images)
+            output_images = model(content_images, style_codes)
 
-        total_loss = content_loss \
-            + style_loss * args.style_weight \
-            + tv_loss * args.tv_weight
+            content_features = loss_network(content_images)
+            style_features = loss_network(style_images)
+            output_features = loss_network(output_images)
 
-        optimizer.zero_grad()
-        total_loss.backward()
-        optimizer.step()
+            style_loss = calc_style_loss(output_features,
+                                         style_features,
+                                         config.STYLE_NODES)
+            content_loss = calc_content_loss(output_features,
+                                             content_features,
+                                             config.CONTENT_NODES)
+            tv_loss = calc_tv_loss(output_images)
 
-        losses['content'].append(content_loss.item())
-        losses['style'].append(style_loss.item())
-        losses['tv'].append(tv_loss.item())
-        losses['total'].append(total_loss.item())
+            total_loss = content_loss \
+                + style_loss * args.style_weight \
+                + tv_loss * args.tv_weight
 
-        if i % 100 == 0:
-            log = f"iter.: {i}"
-            for k, v in losses.items():
-                # calcuate a recent average value
-                avg = sum(v[-50:]) / 50
-                log += f", {k}: {avg:1.4f}"
-            print(log)
+            optimizer.zero_grad()
+            total_loss.backward()
+            optimizer.step()
 
-    plot_losses(losses)
+            losses['content'].append(content_loss.item())
+            losses['style'].append(style_loss.item())
+            losses['tv'].append(tv_loss.item())
+            losses['total'].append(total_loss.item())
+
+            # Log metrics
+            mlflow.log_metrics({
+                "content_loss": content_loss.item(),
+                "style_loss": style_loss.item(),
+                "tv_loss": tv_loss.item(),
+                "total_loss": total_loss.item(),
+            }, step=i)
+
+            if i % 100 == 0:
+                log = f"iter.: {i}"
+                for k, v in losses.items():
+                    # calculate a recent average value
+                    avg = sum(v[-50:]) / 50
+                    log += f", {k}: {avg:1.4f}"
+                print(log)
+
+        # Log the trained model as an artifact
+        mlflow.log_artifact(args.checkpoint_path)
+
+        # Plot losses
+        plot_losses(losses)
+
+    # Save the trained model
     torch.save({"state_dict": model.state_dict()}, args.checkpoint_path)
 
 
