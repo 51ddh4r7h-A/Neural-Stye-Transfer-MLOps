@@ -4,7 +4,7 @@ STYLE_WEIGHT = 5.0
 TV_WEIGHT = 1e-5
 LEARNING_RATE = 1e-4
 BATCH_SIZE = 8
-ITERATIONS = 35_000
+ITERATIONS = 40_000
 
 # Data configurations
 CONTENT_PATH = 'data/content'
