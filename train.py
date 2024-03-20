@@ -3,6 +3,7 @@
 import argparse
 import os
 import torch
+import torch.nn as nn
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchvision.models import vgg16
@@ -18,8 +19,8 @@ from models import StyleTransferNetwork, calc_content_loss, calc_style_loss, cal
 from utils.data_utils import ImageDataset, DataProcessor
 from utils.image_utils import imsave
 
-def plot_losses(losses):
-    """Plot loss graphs."""
+def plot_losses(losses, run_id):
+    """Plot loss graphs and log them as artifacts."""
     plt.figure(figsize=(10, 5))
     plt.plot(losses['content'], label='Content Loss')
     plt.plot(losses['style'], label='Style Loss')
@@ -29,7 +30,15 @@ def plot_losses(losses):
     plt.ylabel('Loss')
     plt.title('Losses Over Training')
     plt.legend()
-    plt.show()
+
+    # Save the plot as an image file
+    plot_path = 'losses.png'
+    plt.savefig(plot_path)
+
+    # Log the plot as an artifact
+    mlflow.log_artifact(plot_path, artifact_path='plots', run_id=run_id)
+
+    plt.close()
 
 def train(args):
     """Train Network."""
@@ -76,12 +85,18 @@ def train(args):
     model.train()
     model = model.to(device)
 
+    # optimizer# Use DataParallel to leverage multiple GPUs
+    if torch.cuda.device_count() > 1:
+        print(f"Using {torch.cuda.device_count()} GPUs!")
+        model = nn.DataParallel(model)
+
     optimizer = Adam(model.parameters(), lr=args.learning_rate)
 
     losses = {'content': [], 'style': [], 'tv': [], 'total': []}
     print("Start training...")
 
-    with mlflow.start_run(experiment_id=experiment_id, run_name="StyleTransferRun"):
+    with mlflow.start_run(experiment_id=experiment_id, run_name="StyleTransferRun") as run:
+        run_id = run.info.run_id
         # Log parameters
         mlflow.log_params({
             "style_weight": args.style_weight,
@@ -106,9 +121,14 @@ def train(args):
 
             output_images = model(content_images, style_codes)
 
-            content_features = loss_network(content_images)
-            style_features = loss_network(style_images)
-            output_features = loss_network(output_images)
+            if isinstance(model, nn.DataParallel):
+                content_features = loss_network(content_images.repeat(torch.cuda.device_count(), 1, 1, 1))
+                style_features = loss_network(style_images.repeat(torch.cuda.device_count(), 1, 1, 1))
+                output_features = loss_network(output_images.repeat(torch.cuda.device_count(), 1, 1, 1))
+            else:
+                content_features = loss_network(content_images)
+                style_features = loss_network(style_images)
+                output_features = loss_network(output_images)
 
             style_loss = calc_style_loss(output_features,
                                          style_features,
@@ -151,10 +171,11 @@ def train(args):
         mlflow.log_artifact(args.checkpoint_path)
 
         # Plot losses
-        plot_losses(losses)
+        plot_losses(losses, run_id)
 
     # Save the trained model
-    torch.save({"state_dict": model.state_dict()}, args.checkpoint_path)
+    checkpoint_path = os.path.join('.', args.checkpoint_path)
+    torch.save({"state_dict": model.module.state_dict()}, checkpoint_path)
 
 
 if __name__ == "__main__":
