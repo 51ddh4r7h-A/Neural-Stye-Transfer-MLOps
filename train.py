@@ -173,20 +173,9 @@ def train(args):
         checkpoint_path = os.path.join('.', args.checkpoint_path)
         torch.save({"state_dict": model.module.state_dict()}, checkpoint_path)
 
-        # Log the trained model as an artifact
-        mlflow.log_artifact(checkpoint_path)
+        # Log the trained model using mlflow.pytorch.log_model
+        mlflow.pytorch.log_model(pytorch_model=model, artifact_path="model", registered_model_name="VGG16Model")
 
-        # Log the training script as an artifact
-        training_script_path = os.path.abspath("./train.py")
-        mlflow.log_artifact(training_script_path, artifact_path="model")
-
-        mlflow.pytorch.log_model(
-            pytorch_model=model,
-            artifact_path="model",
-            code_paths=[f"model/{os.path.basename(training_script_path)}"],
-            conda_env=None,  # Automatically create and log conda.yaml
-            registered_model_name="VGG16Model",
-        )
         # Plot losses
         plot_losses(losses, run_id)
 
