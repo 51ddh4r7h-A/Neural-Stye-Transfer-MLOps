@@ -173,8 +173,8 @@ def train(args):
         checkpoint_path = os.path.join('.', args.checkpoint_path)
         torch.save({"state_dict": model.module.state_dict()}, checkpoint_path)
 
-        # Log the trained model using mlflow.pytorch.log_model
-        mlflow.pytorch.log_model(pytorch_model=model, artifact_path="model", registered_model_name="VGG16Model")
+        # Log the trained model using mlflow.pytorch.log_model with the correct artifact path and file name
+        mlflow.pytorch.log_model(pytorch_model=model, artifact_path="model", registered_model_name="VGG16Model", artifact_name="model.ckpt") 
 
         # Plot losses
         plot_losses(losses, run_id)
