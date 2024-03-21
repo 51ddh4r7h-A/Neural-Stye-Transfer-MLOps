@@ -175,7 +175,7 @@ def train(args):
         # Save the trained model
         torch.save({"state_dict": model.module.state_dict()}, checkpoint_path)
 
-         # Log the trained model using mlflow.pytorch.log_model
+        # Log the trained model using mlflow.pytorch.log_model
         mlflow.pytorch.log_model(pytorch_model=model, artifact_path="model", registered_model_name="VGG16Model")
 
         # Download the artifact folder containing the model.pth file
@@ -188,7 +188,7 @@ def train(args):
         os.rename(model_path, new_model_path)
 
         # Upload the renamed file back to the artifact directory
-        mlflow.artifacts.upload_artifacts(local_dir, artifact_path="model/data", run_id=run_id)
+        mlflow.artifacts.upload(local_dir, artifact_path="model/data", run_id=run_id)
 
         # Plot losses
         plot_losses(losses, run_id)
