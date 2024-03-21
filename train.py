@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 import mlflow
 from mlflow.tracking import MlflowClient
 
+import mlflow.pytorch
+
 from pathlib import Path
 from configs import config
 from models import StyleTransferNetwork, calc_content_loss, calc_style_loss, calc_tv_loss
@@ -174,6 +176,17 @@ def train(args):
         # Log the trained model as an artifact
         mlflow.log_artifact(checkpoint_path)
 
+        # Log the training script as an artifact
+        training_script_path = "./train.py"
+        mlflow.log_artifact(training_script_path, artifact_path="model")
+
+        mlflow.pytorch.log_model(
+            pytorch_model=model,
+            artifact_path="model",
+            code_paths=[f"model/{os.path.basename(training_script_path)}"],
+            conda_env=None,  # Automatically create and log conda.yaml
+            registered_model_name="VGG16Model",
+        )
         # Plot losses
         plot_losses(losses, run_id)
 
