@@ -169,12 +169,13 @@ def train(args):
                     log += f", {k}: {avg:1.4f}"
                 print(log)
 
-        # Save the trained model with the desired file name
-        checkpoint_path = args.checkpoint_path
+        checkpoint_path = os.path.join('.', args.checkpoint_path)
+
+        # Save the trained model
         torch.save({"state_dict": model.module.state_dict()}, checkpoint_path)
 
-        # Log the trained model using mlflow.pytorch.log_model with the correct artifact path and file name
-        mlflow.pytorch.log_model(pytorch_model=model, artifact_path="model", registered_model_name="VGG16Model", model_file=checkpoint_path)
+        # Log the trained model using mlflow.pytorch.log_model
+        mlflow.pytorch.log_model(pytorch_model=model, artifact_path="model", registered_model_name="VGG16Model")
 
         # Plot losses
         plot_losses(losses, run_id)
