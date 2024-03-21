@@ -169,6 +169,7 @@ def train(args):
                     log += f", {k}: {avg:1.4f}"
                 print(log)
 
+        # Update the checkpoint_path with the desired file name
         checkpoint_path = os.path.join('.', args.checkpoint_path)
 
         # Save the trained model
@@ -176,6 +177,11 @@ def train(args):
 
         # Log the trained model using mlflow.pytorch.log_model
         mlflow.pytorch.log_model(pytorch_model=model, artifact_path="model", registered_model_name="VGG16Model")
+
+        # Rename the model file to the desired name
+        model_path = os.path.join(mlflow.get_artifact_uri(), "model/data/model.pth")
+        new_model_path = os.path.join(mlflow.get_artifact_uri(), "model/data/model.ckpt")
+        os.rename(model_path, new_model_path)
 
         # Plot losses
         plot_losses(losses, run_id)
