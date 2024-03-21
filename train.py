@@ -13,8 +13,6 @@ import matplotlib.pyplot as plt
 import mlflow
 from mlflow.tracking import MlflowClient
 
-import mlflow.pytorch
-
 from pathlib import Path
 from configs import config
 from models import StyleTransferNetwork, calc_content_loss, calc_style_loss, calc_tv_loss
