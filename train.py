@@ -177,7 +177,7 @@ def train(args):
         mlflow.log_artifact(checkpoint_path)
 
         # Log the training script as an artifact
-        training_script_path = "./train.py"
+        training_script_path = os.path.abspath("./train.py")
         mlflow.log_artifact(training_script_path, artifact_path="model")
 
         mlflow.pytorch.log_model(
