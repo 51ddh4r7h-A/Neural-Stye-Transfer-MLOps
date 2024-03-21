@@ -167,15 +167,15 @@ def train(args):
                     log += f", {k}: {avg:1.4f}"
                 print(log)
 
+        # Save the trained model
+        checkpoint_path = os.path.join('.', args.checkpoint_path)
+        torch.save({"state_dict": model.module.state_dict()}, checkpoint_path)
+
         # Log the trained model as an artifact
-        mlflow.log_artifact(args.checkpoint_path)
+        mlflow.log_artifact(checkpoint_path)
 
         # Plot losses
         plot_losses(losses, run_id)
-
-    # Save the trained model
-    checkpoint_path = os.path.join('.', args.checkpoint_path)
-    torch.save({"state_dict": model.module.state_dict()}, checkpoint_path)
 
 
 if __name__ == "__main__":
