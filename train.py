@@ -169,26 +169,12 @@ def train(args):
                     log += f", {k}: {avg:1.4f}"
                 print(log)
 
-        # Update the checkpoint_path with the desired file name
-        checkpoint_path = os.path.join('.', args.checkpoint_path)
-
         # Save the trained model
+        checkpoint_path = os.path.join('.', args.checkpoint_path)
         torch.save({"state_dict": model.module.state_dict()}, checkpoint_path)
 
-        # Log the trained model using mlflow.pytorch.log_model
-        mlflow.pytorch.log_model(pytorch_model=model, artifact_path="model", registered_model_name="VGG16Model")
-
-        # Download the artifact folder containing the model.pth file
-        local_dir = "./artifacts"
-        model_path = os.path.join(local_dir, "model", "data", "model.pth")
-        mlflow.artifacts.download_artifacts(run_id=run_id, artifact_path="model/data/model.pth", dst_path=local_dir)
-
-        # Rename the model.pth file to model.ckpt
-        new_model_path = os.path.join(local_dir, "model", "data", "model.ckpt")
-        os.rename(model_path, new_model_path)
-
-        # Upload the renamed file back to the artifact directory
-        mlflow.artifacts.upload(local_dir, artifact_path="model/data", run_id=run_id)
+        # Log the trained model as an artifact
+        mlflow.log_artifact(checkpoint_path)
 
         # Plot losses
         plot_losses(losses, run_id)
