@@ -201,8 +201,6 @@ if __name__ == "__main__":
                         help='Crop size for input images')
     parser.add_argument('--cencrop', action='store_true',
                         help='Use center crop instead of random crop')
-    parser.add_argument('--model_uri', type=str, required=True,
-                    help='URI of the MLflow model to load')
 
     args = parser.parse_args()
 
