@@ -167,12 +167,9 @@ def train(args):
                     log += f", {k}: {avg:1.4f}"
                 print(log)
 
-        # Save the trained model
-        checkpoint_path = os.path.join('.', args.checkpoint_path)
-        torch.save({"state_dict": model.module.state_dict()}, checkpoint_path)
-
-        # Log the trained model as an artifact
-        mlflow.log_artifact(checkpoint_path)
+        # Log the trained model as a PyTorch model
+        model_path = "model"
+        mlflow.pytorch.log_model(model.module, model_path, registered_model_name="StyleTransferModel")
 
         # Plot losses
         plot_losses(losses, run_id)
@@ -204,10 +201,8 @@ if __name__ == "__main__":
                         help='Crop size for input images')
     parser.add_argument('--cencrop', action='store_true',
                         help='Use center crop instead of random crop')
-
-    # Other configurations
-    parser.add_argument('--checkpoint_path', type=str, default='model.ckpt',
-                        help='Path to save the trained model')
+    parser.add_argument('--model_uri', type=str, required=True,
+                    help='URI of the MLflow model to load')
 
     args = parser.parse_args()
 

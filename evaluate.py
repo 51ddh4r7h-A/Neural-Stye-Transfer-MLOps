@@ -2,19 +2,18 @@
 
 import argparse
 import torch
+import mlflow
 
 from configs import config
 from models import StyleTransferNetwork
 from utils.image_utils import *
 from utils.data_utils import *
 
+
 def evaluate(args):
     """Evaluate the network."""
     device = torch.device('cpu')
-    ckpt = torch.load(args.checkpoint_path, map_location=device)
-
-    model = StyleTransferNetwork(num_style=config.NUM_STYLE)
-    model.load_state_dict(ckpt['state_dict'])
+    model = mlflow.pytorch.load_model(args.model_uri, map_location=device)
     model.eval()
 
     content_image = imload(args.content_path, imsize=args.imsize)
@@ -46,13 +45,16 @@ if __name__ == '__main__':
                         help='Input image size')
 
     # Other configurations
-    parser.add_argument('--checkpoint_path', type=str, default='modelv2.ckpt',
-                        help='Path to the trained model checkpoint')
     parser.add_argument('--output_path', type=str, default='stylized_image.jpg',
                         help='Path to save the stylized image')
     parser.add_argument('--style_index', type=int, default=0,
                         help='Index of the style to use (-1 for all styles)')
+    parser.add_argument('--model_uri', type=str, required=False,
+                        help='URI of the MLflow model to load')
 
     args = parser.parse_args()
+
+    if not args.model_uri:
+        args.model_uri = input("Enter the MLflow model URI: ")
 
     evaluate(args)
