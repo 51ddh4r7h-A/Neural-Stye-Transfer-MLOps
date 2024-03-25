@@ -3,6 +3,7 @@
 import argparse
 import torch
 import mlflow
+import os
 
 from configs import config
 from models import StyleTransferNetwork
@@ -13,6 +14,10 @@ from utils.data_utils import *
 def evaluate(args):
     """Evaluate the network."""
     device = torch.device('cpu')
+    # Set up MLflow
+    mlflow.set_tracking_uri("https://dagshub.com/shatter-star/musical-octo-dollop.mlflow")
+    os.environ["MLFLOW_TRACKING_USERNAME"] = "shatter-star"
+    os.environ["MLFLOW_TRACKING_PASSWORD"] = "411996890a0df0c0ccf65dbd848d454f40ad3cbb"
     model = mlflow.pytorch.load_model(args.model_uri, map_location=device)
     model.eval()
 
