@@ -1,0 +1,10 @@
+# Compiled Python files
+__pycache__/
+*.pyc
+
+
+# Checkpoint files
+*.ckpt
+
+# Other
+.DS_Store

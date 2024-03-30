@@ -5,4 +5,8 @@ matplotlib
 numpy
 mlflow
 dagshub
-
+fastapi
+streamlit
+boto3
+uvicorn
+python-multipart
