@@ -10,13 +10,17 @@ from utils.image_utils import imload, imsave
 from configs import config
 import boto3
 from botocore.exceptions import ClientError
+import uvicorn
+from mangum import Mangum
 
 # Set up MLflow with provided environment variables
 mlflow.set_tracking_uri(os.environ["MLFLOW_TRACKING_URI"])
 os.environ["MLFLOW_TRACKING_USERNAME"] = os.environ.get("MLFLOW_TRACKING_USERNAME", "")
 os.environ["MLFLOW_TRACKING_PASSWORD"] = os.environ.get("MLFLOW_TRACKING_PASSWORD", "")
+
 # Initialize FastAPI app
 app = FastAPI()
+handler = Mangum(app)
 
 # Initialize StyleTransferNetwork model
 device = torch.device('cpu')
@@ -27,9 +31,9 @@ model.eval()
 # Configure S3 client using environment variables
 s3_client = boto3.client(
     's3',
-    aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID', ""),
-    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY', ""),
-    region_name=os.environ.get('AWS_DEFAULT_REGION', "")
+    aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+    aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
+    region_name=os.environ['AWS_DEFAULT_REGION']
 )
 S3_BUCKET_NAME = 'stylizedgenimages'
 S3_STYLIZED_IMAGE_PREFIX = 'stylized_images/'
@@ -84,3 +88,9 @@ async def stylize(content_image: UploadFile = File(...), style_index: int = 0):
 @app.get("/")
 def root():
     return {"message": "Style Transfer API is running!"}
+
+# Lambda handler function
+def lambda_handler(event, context):
+    """AWS Lambda handler function"""
+    asgi_handler = handler(event, context)
+    return asgi_handler
