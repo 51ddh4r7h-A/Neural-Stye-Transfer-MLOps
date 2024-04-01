@@ -36,6 +36,9 @@ jobs:
       run: |
         docker pull $DOCKER_HUB_USERNAME/neural-style-transfer:v1
 
+    - name: Set AWS region
+      run: echo "AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+
     - name: Login to Amazon ECR Public
       id: login-ecr-public
       uses: aws-actions/amazon-ecr-login@v2
