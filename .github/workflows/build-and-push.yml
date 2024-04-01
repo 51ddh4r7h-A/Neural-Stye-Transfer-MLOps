@@ -47,15 +47,17 @@ jobs:
 
     - name: Tag Docker image for ECR Public
       env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REGISTRY: public.ecr.aws/x7s1j2h0  # Update with the correct registry URL
       run: |
           docker tag $DOCKER_HUB_USERNAME/neural-style-transfer:v1 $REGISTRY/neural-style-transfer:v1
+      
       
           
     - name: Push Docker image to ECR Public
       env:
-              REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+            REGISTRY: public.ecr.aws/x7s1j2h0  # Update with the correct registry URL
       run: |
-              docker push $REGISTRY/neural-style-transfer:v1
+            docker push $REGISTRY/neural-style-transfer:v1
+        
         
         
