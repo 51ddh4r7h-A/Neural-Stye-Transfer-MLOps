@@ -1,27 +1,24 @@
-name: Build and Push Docker Image
+name: Pull and Push Docker Image
 
 on:
   push:
     branches:
       - main
 
-env:
-  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-  DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-
 jobs:
-
-  build-and-push:
-    name: Build and Push Docker Image
+  pull-and-push:
     runs-on: ubuntu-latest
 
+    env:
+      DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+      DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
     steps:
-    - name: Checkout Code
+    - name: Checkout code
       uses: actions/checkout@v2
 
     - name: Build Docker image
@@ -30,8 +27,11 @@ jobs:
         docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
         docker push $DOCKER_HUB_USERNAME/neural-style-transfer:v1
 
-    - name: Set AWS region
-      run: echo "AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+    - name: Pull Docker image from Docker Hub
+      run: docker pull $DOCKER_HUB_USERNAME/neural-style-transfer:v1
+
+    - name: Tag Docker image for ECR
+      run: docker tag $DOCKER_HUB_USERNAME/neural-style-transfer:v1 $ECR_REPOSITORY/neural-style-transfer:v1
 
     - name: Login to Amazon ECR
       id: login-ecr
@@ -40,9 +40,4 @@ jobs:
         mask-password: true
 
     - name: Push Docker image to ECR
-      env:
-        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-        IMAGE_TAG: v1
-      run: |
-        docker tag $DOCKER_HUB_USERNAME/neural-style-transfer:v1 $ECR_REGISTRY/$ECR_REPOSITORY:v1
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:v1
+      run: docker push $ECR_REPOSITORY/neural-style-transfer:v1
