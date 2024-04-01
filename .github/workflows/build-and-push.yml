@@ -1,0 +1,28 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+
+jobs:
+
+  build-and-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Build Docker image
+      run: |
+        docker build -t $DOCKER_HUB_USERNAME/neural-style-transfer:v1 .
+        docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+        docker tag $DOCKER_HUB_USERNAME/neural-style-transfer:v1 $ECR_REPOSITORY/neural-style-transfer:v1
+        docker push $ECR_REPOSITORY/neural-style-transfer:v1
