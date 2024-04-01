@@ -21,6 +21,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Set AWS region
+      run: echo "AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
@@ -32,9 +35,6 @@ jobs:
         docker build -t $DOCKER_HUB_USERNAME/neural-style-transfer:v1 .
         docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
         docker push $DOCKER_HUB_USERNAME/neural-style-transfer:v1
-
-    - name: Set AWS region
-      run: echo "AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
 
     - name: Pull Docker image from Docker Hub
       run: docker pull $DOCKER_HUB_USERNAME/neural-style-transfer:v1
