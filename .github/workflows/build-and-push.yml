@@ -8,10 +8,11 @@ on:
 env:
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
   DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
-  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
 
 jobs:
 
@@ -30,16 +31,17 @@ jobs:
         docker push $DOCKER_HUB_USERNAME/neural-style-transfer:v1
 
     - name: Set AWS region
-      run: |
-          echo "AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+      run: echo "AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
 
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+      with:
+        mask-password: true
 
     - name: Push Docker image to ECR
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
         IMAGE_TAG: v1
       run: |
         docker tag $DOCKER_HUB_USERNAME/neural-style-transfer:v1 $ECR_REGISTRY/$ECR_REPOSITORY:v1
