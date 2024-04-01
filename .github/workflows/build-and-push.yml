@@ -30,7 +30,8 @@ jobs:
         docker push $DOCKER_HUB_USERNAME/neural-style-transfer:v1
 
     - name: Set AWS region
-      run: echo "::set-env name=AWS_REGION::${{ secrets.AWS_DEFAULT_REGION }}"
+      run: |
+          echo "AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
 
     - name: Login to Amazon ECR
       id: login-ecr
