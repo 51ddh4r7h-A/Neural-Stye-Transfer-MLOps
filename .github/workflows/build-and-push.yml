@@ -24,11 +24,13 @@ jobs:
     - name: Set AWS region
       run: echo "AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
 
-    - name: Login to Amazon public ECR
-      id: login-ecr-public
+    - name: Login to Amazon ECR
+      id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
       with:
+        mask-password: true
         registry-type: public
+
 
     - name: Build Docker image
       run: |
@@ -40,7 +42,7 @@ jobs:
       run: docker pull $DOCKER_HUB_USERNAME/neural-style-transfer:v1
 
     - name: Tag Docker image for ECR
-      run: docker tag $DOCKER_HUB_USERNAME/neural-style-transfer:v1 ${{ steps.login-ecr-public.outputs.registry }}/$ECR_BASE_PATH/neural-style-transfer:v1
+      run: docker tag $DOCKER_HUB_USERNAME/neural-style-transfer:v1 ${{ steps.login-ecr.outputs.registry }}/$ECR_BASE_PATH/neural-style-transfer:v1
 
     - name: Push Docker image to ECR
-      run: docker push ${{ steps.login-ecr-public.outputs.registry }}/$ECR_BASE_PATH/neural-style-transfer:v1
+      run: docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_BASE_PATH/neural-style-transfer:v1
