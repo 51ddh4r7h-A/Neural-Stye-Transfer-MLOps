@@ -1,4 +1,4 @@
-name: Pull and Push Docker Image
+name: Build, Push, and Pull Docker Image
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  pull-and-push:
+  build-push-pull:
     runs-on: ubuntu-latest
 
     env:
@@ -15,15 +15,32 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-      ECR_REGISTRY: public.ecr.aws
-      ECR_REPOSITORY_PATH: x7s1j2h0/style/neural-style-transfer
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-    - name: Set AWS region
-      run: echo "AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::873393246907:user/sid
+        aws-region: ap-south-1
+
+    - name: Build Docker image
+      run: |
+        docker build -t $DOCKER_HUB_USERNAME/neural-style-transfer:v1 .
+      
+    - name: Log in to Docker Hub
+      run: |
+        echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u $DOCKER_HUB_USERNAME --password-stdin
+
+    - name: Push Docker image to Docker Hub
+      run: |
+        docker push $DOCKER_HUB_USERNAME/neural-style-transfer:v1
+
+    - name: Pull Docker image from Docker Hub
+      run: |
+        docker pull $DOCKER_HUB_USERNAME/neural-style-transfer:v1
 
     - name: Login to Amazon ECR Public
       id: login-ecr-public
@@ -31,21 +48,16 @@ jobs:
       with:
         registry-type: public
 
-    - name: Build Docker image
-      run: |
-        docker build -t $DOCKER_HUB_USERNAME/neural-style-transfer:v1 .
-        docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
-        docker push $DOCKER_HUB_USERNAME/neural-style-transfer:v1
-
-    - name: Pull Docker image from Docker Hub
-      run: docker pull $DOCKER_HUB_USERNAME/neural-style-transfer:v1
-
     - name: Tag Docker image for ECR Public
       env:
-        REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-      run: docker tag $DOCKER_HUB_USERNAME/neural-style-transfer:v1 $REGISTRY/$ECR_REPOSITORY_PATH:v1
-
+          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+      run: |
+          docker tag $DOCKER_HUB_USERNAME/neural-style-transfer:v1 $REGISTRY/neural-style-transfer:v1
+      
+          
     - name: Push Docker image to ECR Public
       env:
-        REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-      run: docker push $REGISTRY/$ECR_REPOSITORY_PATH:v1
+          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+      run: |
+            docker push $REGISTRY/neural-style-transfer:v1
+        
