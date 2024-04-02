@@ -1,63 +1,49 @@
-name: Build, Push, and Pull Docker Image
-
-on:
-  push:
-    branches:
-      - main
-
+name: build-and-push-docker-image-to-ecr
+on: 
+  push: 
+    branches: [ "main" ]
+  
 jobs:
-  build-push-pull:
-    runs-on: ubuntu-latest
-
-    env:
-      DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-      DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
-
-    - name: Build Docker image
-      run: |
-        docker build -t $DOCKER_HUB_USERNAME/neural-style-transfer:v1 .
+  push-automation:
+    name: Build, Push to Docker Hub, and Pull into ECR
+    runs-on: ubuntu-latest  
+    steps:  
+      - name: Checkout
+        uses: actions/checkout@v3
+  
+      - name: Build Docker Image
+        run: docker build -t sid6601/neural-style-transfer:${{ github.sha }} .
       
-    - name: Log in to Docker Hub
-      run: |
-        echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u $DOCKER_HUB_USERNAME --password-stdin
-
-    - name: Push Docker image to Docker Hub
-      run: |
-        docker push $DOCKER_HUB_USERNAME/neural-style-transfer:v1
-
-    - name: Pull Docker image from Docker Hub
-      run: |
-        docker pull $DOCKER_HUB_USERNAME/neural-style-transfer:v1
-
-    - name: Set AWS region
-      run: echo "AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
-
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-      with:
-        mask-password: true
-
-    - name: Tag Docker image for ECR Public
-      env:
-          REGISTRY: public.ecr.aws/x7s1j2h0  # Update with the correct registry URL
-      run: |
-          docker tag $DOCKER_HUB_USERNAME/neural-style-transfer:v1 $REGISTRY/neural-style-transfer:v1
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
       
+      - name: Push Docker Image to Docker Hub
+        run: docker push sid6601/neural-style-transfer:${{ github.sha }}
       
+      - name: Set AWS region
+        run: echo "AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::873393246907:role/ECRPushRole
+          aws-region: ap-south-1
           
-    - name: Push Docker image to ECR Public
-      env:
-            REGISTRY: public.ecr.aws/x7s1j2h0  # Update with the correct registry URL
-      run: |
-            docker push $REGISTRY/neural-style-transfer:v1
-        
-        
-        
+      - name: Login to Amazon ECR Public
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+          mask-password: 'false'
+          
+      - name: Pull Docker Image from Docker Hub
+        run: docker pull sid6601/neural-style-transfer:${{ github.sha }}
+      
+      - name: Tag Docker Image for ECR
+        run: docker tag sid6601/neural-style-transfer:${{ github.sha }} ${{ steps.login-ecr-public.outputs.registry }}/neural-style-transfer:${{ github.sha }}
+      
+      
+      - name: Push Docker Image to Amazon ECR Public
+        run: docker push ${{ steps.login-ecr-public.outputs.registry }}/neural-style-transfer:${{ github.sha }}
+      
+      
