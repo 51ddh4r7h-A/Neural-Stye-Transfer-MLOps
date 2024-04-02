@@ -5,14 +5,14 @@ on:
 
 jobs:
   push-automation:
-    name: Build, Push to Docker Hub, and Pull into ECR
+    name: Build, Push to Docker Hub and Amazon ECR Public
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Build Docker Image
-        run: docker build -t sid6601/neural-style-transfer:v1 .
+        run: docker build -t capstone .
 
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
@@ -20,8 +20,8 @@ jobs:
       - name: Push Docker Image to Docker Hub
         run: docker push sid6601/neural-style-transfer:v1
 
-      - name: Set AWS region
-        run: echo "AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+      - name: Pull Docker Image from Docker Hub
+        run: docker pull sid6601/neural-style-transfer:v1
 
       - name: Install AWS CLI
         run: |
@@ -33,13 +33,10 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin public.ecr.aws/x7s1j2h0/capstone
-
-      - name: Pull Docker Image from Docker Hub
-        run: docker pull sid6601/neural-style-transfer:v1
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/x7s1j2h0
 
       - name: Tag Docker Image for ECR
-        run: docker tag sid6601/neural-style-transfer:v1 public.ecr.aws/x7s1j2h0/capstone:v1
+        run: docker sid6601/neural-style-transfer:v1 public.ecr.aws/x7s1j2h0/capstone:v1
 
       - name: Push Docker Image to Amazon ECR Public
         run: docker push public.ecr.aws/x7s1j2h0/capstone:v1
