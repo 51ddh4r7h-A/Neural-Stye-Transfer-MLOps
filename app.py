@@ -19,11 +19,6 @@ import boto3
 from botocore.exceptions import ClientError
 from mangum import Mangum
 
-# Set up MLflow with provided environment variables
-mlflow.set_tracking_uri(os.environ["MLFLOW_TRACKING_URI"])
-os.environ["MLFLOW_TRACKING_USERNAME"] = os.environ.get("MLFLOW_TRACKING_USERNAME", "")
-os.environ["MLFLOW_TRACKING_PASSWORD"] = os.environ.get("MLFLOW_TRACKING_PASSWORD", "")
-
 # Initialize FastAPI app
 app = FastAPI()
 handler = Mangum(app)
@@ -37,10 +32,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize StyleTransferNetwork model
-device = torch.device('cpu')
-model_uri = os.environ["MODEL_URI"]
-model = mlflow.pytorch.load_model(model_uri, map_location=device)
+# Define the path to the local model directory
+local_model_path = "local_model/model"
+
+# Load the model from the local directory
+model = mlflow.pytorch.load_model(local_model_path, map_location=torch.device('cpu'))
 model.eval()
 
 # Configure S3 client using the IAM role assigned to the Lambda function
