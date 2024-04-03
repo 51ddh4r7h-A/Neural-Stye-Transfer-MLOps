@@ -9,6 +9,7 @@ RUN pip install gunicorn mangum --target "${LAMBDA_TASK_ROOT}"
 
 COPY . .
 
+ENV MLFLOW_TRACKING_URI="https://dagshub.com/shatter-star/musical-octo-dollop.mlflow"
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 
