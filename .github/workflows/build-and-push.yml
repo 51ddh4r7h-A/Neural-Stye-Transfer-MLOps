@@ -1,9 +1,11 @@
 name: Build and push image to ECR
 
 on:
-  push:
-    paths:
-      - '.github/workflows/build-and-push.yml'
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'V-0.1.1'
+        required: true
 
 jobs:
   build:
@@ -13,7 +15,10 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
-      
+
+      - name: Update version file
+        run: echo ${{ github.event.inputs.image_tag }} > version.txt
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -29,8 +34,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: neural-style-transfer
-          IMAGE_TAG: V-0.0.1
+          IMAGE_TAG: ${{ github.event.inputs.image_tag }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
