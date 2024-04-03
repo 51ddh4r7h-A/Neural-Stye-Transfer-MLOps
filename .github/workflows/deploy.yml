@@ -9,8 +9,8 @@ on:
 
 env:
   AWS_REGION: ap-south-1
-  ECR_REPOSITORY: your-ecr-repository-name
-  LAMBDA_FUNCTION_NAME: your-lambda-function-name
+  ECR_REPOSITORY: neural-style-transfer
+  LAMBDA_FUNCTION_NAME: clark
 
 jobs:
 
