@@ -43,13 +43,8 @@ model_uri = os.environ["MODEL_URI"]
 model = mlflow.pytorch.load_model(model_uri, map_location=device)
 model.eval()
 
-# Configure S3 client using environment variables
-s3_client = boto3.client(
-    's3',
-    aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
-    aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
-    region_name=os.environ['AWS_DEFAULT_REGION']
-)
+# Configure S3 client using the IAM role assigned to the Lambda function
+s3_client = boto3.client('s3')
 S3_BUCKET_NAME = 'stylizedgenimages'
 S3_STYLIZED_IMAGE_PREFIX = 'stylized_images/'
 
