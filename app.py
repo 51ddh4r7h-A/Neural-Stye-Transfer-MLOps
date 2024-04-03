@@ -32,11 +32,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define the path to the local model directory
-local_model_path = "local_model/model"
+# Define the path to the model file
+model_file_path = "local_model/model/data/model.pth"
 
-# Load the model from the local directory
-model = mlflow.pytorch.load_model(local_model_path, map_location=torch.device('cpu'))
+# Load the model from the specified file path
+model = torch.load(model_file_path, map_location=torch.device('cpu'))
 model.eval()
 
 # Configure S3 client using the IAM role assigned to the Lambda function
