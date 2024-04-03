@@ -1,8 +1,15 @@
+import os
+import sys
+
+# Set the root directory as the working directory
+root = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(root)
+
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 import shutil
 import tempfile
-import os
 import torch
 import mlflow.pytorch
 from models import StyleTransferNetwork
@@ -10,7 +17,6 @@ from utils.image_utils import imload, imsave
 from configs import config
 import boto3
 from botocore.exceptions import ClientError
-import uvicorn
 from mangum import Mangum
 
 # Set up MLflow with provided environment variables
@@ -21,6 +27,15 @@ os.environ["MLFLOW_TRACKING_PASSWORD"] = os.environ.get("MLFLOW_TRACKING_PASSWOR
 # Initialize FastAPI app
 app = FastAPI()
 handler = Mangum(app)
+
+# Initialize CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow requests from all origins
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
 
 # Initialize StyleTransferNetwork model
 device = torch.device('cpu')
@@ -85,12 +100,5 @@ async def stylize(content_image: UploadFile = File(...), style_index: int = 0):
         os.unlink(output_path)
 
 
-@app.get("/")
-def root():
-    return {"message": "Style Transfer API is running!"}
-
-# Lambda handler function
 def lambda_handler(event, context):
-    """AWS Lambda handler function"""
-    asgi_handler = handler(event, context)
-    return asgi_handler
+    return handler(event, context)
