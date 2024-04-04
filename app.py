@@ -17,11 +17,9 @@ from utils.image_utils import imload, imsave
 from configs import config
 import boto3
 from botocore.exceptions import ClientError
-from mangum import Mangum
 
 # Initialize FastAPI app
 app = FastAPI()
-handler = Mangum(app)
 
 # Initialize CORS middleware
 app.add_middleware(
@@ -90,6 +88,6 @@ async def stylize(content_image: UploadFile = File(...), style_index: int = 0):
         os.unlink(content_path)
         os.unlink(output_path)
 
-
-def lambda_handler(event, context):
-    return handler(event, context)
+@app.get("/")
+def root():
+    return {"message": "Style Transfer API is running!"}
