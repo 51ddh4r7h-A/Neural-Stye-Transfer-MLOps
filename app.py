@@ -91,3 +91,7 @@ async def stylize(content_image: UploadFile = File(...), style_index: int = 0):
 @app.get("/")
 def root():
     return {"message": "Style Transfer API is running!"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
