@@ -44,7 +44,7 @@ S3_BUCKET_NAME = 'stylizedgenimages'
 S3_STYLIZED_IMAGE_PREFIX = 'stylized_images/'
 
 # Define the endpoint for stylizing images
-@app.post("/stylize/")
+@app.post("/stylize")
 async def stylize(content_image: UploadFile = File(...), style_index: int = 0):
     try:
         # Validate the style index
