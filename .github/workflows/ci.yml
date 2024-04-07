@@ -22,3 +22,5 @@ jobs:
       run: docker build -t sid6601/neural-style-transfer .
     - name: Push to Dockerhub
       run: docker push sid6601/neural-style-transfer:latest
+
+      
