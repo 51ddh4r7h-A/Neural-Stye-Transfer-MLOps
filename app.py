@@ -21,6 +21,8 @@ from botocore.exceptions import ClientError
 # Initialize FastAPI app
 app = FastAPI()
 
+mlflow.set_tracking_uri("https://dagshub.com/shatter-star/musical-octo-dollop.mlflow")
+
 # Initialize CORS middleware
 app.add_middleware(
     CORSMiddleware,
@@ -30,11 +32,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define the path to the model file
-model_file_path = "local_model/model/data/model.pth"
-
-# Load the model from the specified file path
-model = torch.load(model_file_path, map_location=torch.device('cpu'))
+# Initialize StyleTransferNetwork model
+device = torch.device('cpu')
+model_uri = "mlflow-artifacts:/366666ce4dc8413383fd5d9a1ce802f9/8c9c0df67b1d4151886eec4a77c36417/artifacts/model"
+model = mlflow.pytorch.load_model(model_uri, map_location=device)
 model.eval()
 
 # Configure S3 client using the IAM role assigned to the Lambda function
@@ -94,4 +95,4 @@ def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8080)

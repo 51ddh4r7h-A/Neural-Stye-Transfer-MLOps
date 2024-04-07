@@ -1,10 +1,9 @@
 # Compiled Python files
 __pycache__/
 *.pyc
-
-
+#images folder
+imgs/style
 # Checkpoint files
 *.ckpt
-
 # Other
 .DS_Store

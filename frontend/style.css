@@ -1,0 +1,77 @@
+/* General Styles */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f0f0f0;
+  }
+  
+  /* Streamlit Components */
+  .stButton > button {
+    background-color: #486645;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  
+  .stButton > button:hover {
+    background-color: #2ade30e4;
+    color:#000;
+  }
+  
+  .stSlider > div > div > div > div {
+    background-color: #4CAF50;
+  }
+  
+  .stFileUploader > div > label {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .stFileUploader > div > label:hover {
+    background-color: #45a049;
+  }
+  
+  /* Sidebar Styles */
+  .sidebar .sidebar-content {
+    background-color: #f0f0f0;
+    padding: 20px;
+  }
+  
+  .sidebar .sidebar-content h2 {
+    color: #4CAF50;
+    font-weight: bold;
+  }
+  
+  .sidebar .sidebar-content hr {
+    border-color: #4CAF50;
+  }
+  
+  /* Main Content Styles */
+  .main .main-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .main .main-content h1 {
+    color: #4CAF50;
+    font-weight: bold;
+  }
+  
+  .main .main-content h2 {
+    color: #4CAF50;
+    font-weight: bold;
+  }
+  
+  .main .main-content p {
+    color: #333;
+  }
