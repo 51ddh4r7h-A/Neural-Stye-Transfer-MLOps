@@ -23,4 +23,3 @@ jobs:
     - name: Push to Dockerhub
       run: docker push sid6601/neural-style-transfer:latest
 
-      
