@@ -15,4 +15,5 @@ jobs:
     - name: Delete Old docker container
       run: sudo docker rm -f neural-style-transfer-container || true
     - name: Run Docker Container
-      run: sudo docker run -d -p 8000:8000 --name neural-style-transfer-container sid6601/neural-style-transfer
+      run: sudo docker run -d -p 8000:8000 --restart always --name neural-style-transfer-container sid6601/neural-style-transfer
+
