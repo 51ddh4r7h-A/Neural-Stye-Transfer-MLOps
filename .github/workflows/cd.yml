@@ -1,19 +1,27 @@
 name: CD Pipeline
 
 on:
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
-
-  build:
-
+  deploy:
     runs-on: self-hosted
-
     steps:
-    - name: Pull Docker image
-      run: sudo docker pull sid6601/neural-style-transfer:latest
-    - name: Delete Old docker container
-      run: sudo docker rm -f neural-style-transfer-container || true
-    - name: Run Docker Container
-      run: sudo docker run -d -p 8000:8000 --name neural-style-transfer-container sid6601/neural-style-transfer
-
+      - name: Pull Docker image
+        run: sudo docker pull sid6601/neural-style-transfer:latest
+      - name: Delete Old Docker container
+        run: sudo docker rm -f neural-style-transfer-container || true
+      - name: Run Docker Container
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          sudo docker run -d \
+          -p 8000:8000 \
+          --name neural-style-transfer-container \
+          -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+          -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+          sid6601/neural-style-transfer
+      - name: Install ngrok
+        run: |
+            curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list && sudo apt update && sudo apt install ngrok

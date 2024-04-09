@@ -40,8 +40,8 @@ model.eval()
 
 # Configure S3 client using the IAM role assigned to the Lambda function
 s3_client = boto3.client('s3')
-S3_BUCKET_NAME = 'stylizedgenimages'
-S3_STYLIZED_IMAGE_PREFIX = 'stylized_images/'
+S3_BUCKET_NAME = 'neural-images'
+S3_STYLIZED_IMAGE_PREFIX = 'images/'
 
 # Define the endpoint for stylizing images
 @app.post("/stylize")

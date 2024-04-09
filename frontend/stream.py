@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 
 # Define the FastAPI endpoint URL
-FASTAPI_URL = "http://localhost:8000/stylize/"
+FASTAPI_URL = "https://ff3c-49-204-29-182.ngrok-free.app/stylize/"
 
 # Set page configuration
 st.set_page_config(
