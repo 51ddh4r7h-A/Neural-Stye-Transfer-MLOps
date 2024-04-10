@@ -30,15 +30,15 @@ jobs:
         push: true
         tags: sid6601/neural-style-transfer:latest
         
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - name: Deploy to production
-      uses: johnbeynon/render-deploy-action@v0.0.8
-      with:
-        service-id: ${{ secrets.RENDER_SERVICE_ID }}
-        api-key: ${{ secrets.RENDER_API_KEY }}
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Deploy to production
+  #     uses: johnbeynon/render-deploy-action@v0.0.8
+  #     with:
+        # service-id: {{ secrets.RENDER_SERVICE_ID }}
+        # api-key: {{ secrets.RENDER_API_KEY }}
 
 
 # sudo docker run -d \
