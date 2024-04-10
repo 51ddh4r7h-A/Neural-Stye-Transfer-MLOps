@@ -7,5 +7,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Run the FastAPI application and keep the container running indefinitely
-CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port 8000 & tail -f /dev/null"]
+
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

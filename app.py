@@ -39,7 +39,12 @@ model = mlflow.pytorch.load_model(model_uri, map_location=device)
 model.eval()
 
 # Configure S3 client using the IAM role assigned to the Lambda function
-s3_client = boto3.client('s3')
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'),
+    region_name=os.environ.get('AWS_DEFAULT_REGION')
+)
 S3_BUCKET_NAME = 'neural-images'
 S3_STYLIZED_IMAGE_PREFIX = 'images/'
 
