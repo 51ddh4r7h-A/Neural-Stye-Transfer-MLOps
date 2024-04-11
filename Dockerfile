@@ -2,10 +2,19 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+ARG AWS_DEFAULT_REGION
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+ENV AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+ENV AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 80
+
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80"]
