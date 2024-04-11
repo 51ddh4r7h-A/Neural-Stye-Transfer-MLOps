@@ -8,5 +8,6 @@ dagshub
 fastapi
 boto3
 uvicorn
-python-multipart
+python-multipart 
+
 
