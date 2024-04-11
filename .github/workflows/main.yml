@@ -27,5 +27,5 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: sid6601/Rick:latest
+        tags: sid6601/image-fusion:latest
         
