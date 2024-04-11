@@ -1,6 +1,6 @@
 Pillow
-torch == 2.2.2+cpu
-torchvision == 0.17.2+cpu
+torch == 1.10.0+cpu
+torchvision==0.11.0+cpu
 matplotlib
 numpy
 mlflow
