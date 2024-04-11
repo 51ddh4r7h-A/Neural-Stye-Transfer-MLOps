@@ -6,7 +6,7 @@ on:
 jobs:
 
   build:
-    name: Building image
+    name: Continuos Integration
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -28,4 +28,25 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: sid6601/image-style-fusion:latest
+
+  deploy:
+      name: Continuos Deployment
+      needs: build
+      runs-on: self-hosted
+      steps:
+        - name: Deploy to EC2 instance
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ secrets.HOST }}
+            username: ${{ secrets.EC2_USERNAME }}
+            key: ${{ secrets.EC2_PRIVATE_KEY }}
+            script: |
+              sudo docker pull sid6601/image-style-fusion:latest
+              sudo docker rm -f image-style-fusion || true
+              sudo docker run -d \
+               -p 80:80 \
+               -e AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} \
+               -e AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} \
+               -e AWS_DEFAULT_REGION=${{secrets.AWS_DEFAULT_REGION}} \
+               --name image-style-fusion sid6601/image-style-fusion:latest
         
