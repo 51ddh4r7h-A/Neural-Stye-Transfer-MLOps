@@ -36,8 +36,15 @@ st.markdown(
 
 st.image("imgs/all_styles.png")
 
+# Initialize session state
+if "value" not in st.session_state:
+    st.session_state.value = "Neural Style Transfer"
+
 # Sidebar
 with st.sidebar:
+    if st.button("Reload"):
+        st.session_state.value = "Neural Style Transfer"
+        st.rerun()
     st.subheader("Settings")
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     style_index = st.slider("Select Style Index:", min_value=-1, max_value=15, value=0)
@@ -76,7 +83,7 @@ with st.container():
     st.markdown(
         """
         <div style="text-align: left; text-decoration: none;">
-        <a href="https://github.com/your-username/your-repo" target="_blank" style="color: #F3EDF0; text-decoration: none;">
+        <a href="https://github.com/shatter-star/musical-octo-dollop" target="_blank" style="color: #F3EDF0; text-decoration: none;">
             <i class="fab fa-github fa-2x"></i> GitHub
         </a>
         </div>
