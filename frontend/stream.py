@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 
 # Define the FastAPI endpoint URL
-FASTAPI_URL = "https://glowing-acorn-r995vwv7gpghwp4-8000.app.github.dev/stylize"
+FASTAPI_URL = "http://localhost:8000/stylize"
 
 # Set page configuration
 st.set_page_config(
