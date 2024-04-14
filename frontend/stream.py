@@ -12,7 +12,7 @@ FASTAPI_URL = "http://localhost:8000/stylize"
 st.set_page_config(
     page_title="Image Stylization",
     page_icon=":art:",
-    layout="wide",
+    layout="centered",
     initial_sidebar_state="expanded",
 )
 
