@@ -36,9 +36,8 @@ jobs:
     steps:
       - name: Deploy to own machine
         run: |
-            docker pull sid6601/image-style-fusion:latest
-            docker rm -f image-style-fusion || true
-            docker run -d \
-            -p 80:80 \
-            --name image-style-fusion sid6601/image-style-fusion:latest
+            sudo docker stop image-style-fusion
+            sudo docker rm -f image-style-fusion || true
+            sudo docker pull sid6601/image-style-fusion:latest
+            sudo docker run -d -p 80:80 --name image-style-fusion sid6601/image-style-fusion:latest
          
