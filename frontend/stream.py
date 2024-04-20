@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 
 # Define the FastAPI endpoint URL
-FASTAPI_URL = "http://localhost:8000/stylize"
+FASTAPI_URL = "http://ec2-18-60-212-118.ap-south-2.compute.amazonaws.com/stylize"
 
 # Set page configuration
 st.set_page_config(
@@ -34,7 +34,8 @@ st.markdown(
     """
 )
 
-st.image("imgs/all_styles.png")
+st.image("imgs/all_stylesv2.png")
+#st.image("imgs/all_stylesv1.jpg")
 
 # Initialize session state
 if "value" not in st.session_state:
