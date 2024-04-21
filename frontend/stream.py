@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 
 # Define the FastAPI endpoint URL
-FASTAPI_URL = "http://ec2-18-60-212-118.ap-south-2.compute.amazonaws.com/stylize"
+FASTAPI_URL = "http://localhost:8000/stylize"
 
 # Set page configuration
 st.set_page_config(
