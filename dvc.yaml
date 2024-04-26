@@ -1,13 +1,24 @@
 stages:
+  pull_data:
+    cmd: >
+      dvc pull -r origin data
+
   train:
     cmd: >
       python backend/train.py
       --content_path ./data/content
       --style_path ./data/style
+    deps:
+      - pull_data
+    outs:
+      - mlflow-artifacts:/models
+
   evaluate:
     cmd: >
       python backend/evaluate.py
       --content_path ./backend/src/imgs/gentlecat.png
       --style_index -1
       --output_path stylized.png
-      --model_uri mlflow-artifacts:/366666ce4dc8413383fd5d9a1ce802f9/d3b22973d11e4765a60d82a68edca4d7/artifacts/model
+      --model_uri $(dvc ref -d train)
+    deps:
+      - train
