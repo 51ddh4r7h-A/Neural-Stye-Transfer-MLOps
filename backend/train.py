@@ -174,7 +174,10 @@ def train(args):
 
         # Log the trained model as a PyTorch model
         model_path = "model"
-        mlflow.pytorch.log_model(model.module, model_path, registered_model_name="StyleTransferModel")
+        if isinstance(model, nn.DataParallel):
+            mlflow.pytorch.log_model(model.module, model_path, registered_model_name="StyleTransferModel")
+        else:
+            mlflow.pytorch.log_model(model, model_path, registered_model_name="StyleTransferModel")
 
         # Plot losses
         plot_losses(losses, run_id)
