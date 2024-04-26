@@ -1,2 +1,13 @@
 data/
 /data
+__pycache__/
+*.pyc
+
+# Data files
+#data/
+
+# Checkpoint files
+*.ckpt
+
+# Other
+.DS_Store
