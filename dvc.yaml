@@ -6,10 +6,8 @@ stages:
   train:
     cmd: >
       python backend/train.py
-      --content_path ./data/content
-      --style_path ./data/style
-    deps:
-      - pull_data
+      --content_path ./data/content-v2
+      --style_path ./data/style-v2
     outs:
       - mlflow-artifacts:/models
 
