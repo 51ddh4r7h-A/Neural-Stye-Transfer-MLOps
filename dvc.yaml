@@ -5,18 +5,8 @@ stages:
 
   train:
     cmd: >
-      python backend/train.py
-      --content_path ./data/content-v2
-      --style_path ./data/style-v2
-    outs:
-      - mlflow-artifacts:/models
+      python backend/train.py --content_path ./data/content-v2  --style_path ./data/style-v2
 
   evaluate:
     cmd: >
-      python backend/evaluate.py
-      --content_path ./backend/src/imgs/gentlecat.png
-      --style_index -1
-      --output_path stylized.png
-      --model_uri $(dvc ref -d train)
-    deps:
-      - train
+        python backend/evaluate.py --content_path ./backend/src/imgs/gentlecat.png --style_index -1 --output_path stylized.png

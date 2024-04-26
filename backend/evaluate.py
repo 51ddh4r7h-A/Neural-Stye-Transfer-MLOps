@@ -5,7 +5,11 @@ import os
 src_dir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, src_dir)
 
-import argparse, torch, os, mlflow
+import argparse
+import torch
+import os
+import mlflow
+from mlflow.tracking import MlflowClient
 
 from src.configs import config
 from src.models import StyleTransferNetwork
@@ -13,14 +17,27 @@ from src.utils.image_utils import *
 from src.utils.data_utils import *
 
 
+def get_latest_model_uri():
+    """Retrieve the URI of the latest MLflow model."""
+    # Set up MLflow client
+    mlflow.set_tracking_uri("https://dagshub.com/shatter-star/musical-octo-dollop.mlflow")
+    client = MlflowClient()
+
+    # Get the latest run
+    latest_run = client.search_runs(experiment_ids="0", order_by=["attribute.start_time DESC"], max_results=1)[0]
+
+    # Get the model URI from the latest run
+    model_uri = latest_run.info.artifact_uri + "/model"
+
+    return model_uri
+
+
 def evaluate(args):
     """Evaluate the network."""
     device = torch.device('cpu')
-    # Set up MLflow
-    mlflow.set_tracking_uri("https://dagshub.com/shatter-star/musical-octo-dollop.mlflow")
-    os.environ["MLFLOW_TRACKING_USERNAME"] = "shatter-star"
-    os.environ["MLFLOW_TRACKING_PASSWORD"] = "411996890a0df0c0ccf65dbd848d454f40ad3cbb"
-    model = mlflow.pytorch.load_model(args.model_uri, map_location=device)
+    # Get the latest model URI
+    model_uri = get_latest_model_uri()
+    model = mlflow.pytorch.load_model(model_uri, map_location=device)
     model.eval()
 
     content_image = imload(args.content_path, imsize=args.imsize)
@@ -56,12 +73,13 @@ if __name__ == '__main__':
                         help='Path to save the stylized image')
     parser.add_argument('--style_index', type=int, default=0,
                         help='Index of the style to use (-1 for all styles)')
-    parser.add_argument('--model_uri', type=str, required=False,
-                        help='URI of the MLflow model to load')
+    parser.add_argument('--model_uri', type=str, default=None,
+                        help='URI of the MLflow model to load. If not specified, the latest model will be fetched.')
 
     args = parser.parse_args()
 
     if not args.model_uri:
-        args.model_uri = input("Enter the MLflow model URI: ")
+        # Get the latest model URI if not provided
+        args.model_uri = get_latest_model_uri()
 
     evaluate(args)
