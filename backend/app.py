@@ -1,10 +1,11 @@
 """FastAPI App."""
 
 import sys
-sys.path.insert(0, './src')
+import os
+src_dir = os.path.join(os.path.dirname(__file__), 'src')
+sys.path.insert(0, src_dir)
 
 import boto3
-import os, sys
 import shutil
 import tempfile
 import torch, mlflow.pytorch
