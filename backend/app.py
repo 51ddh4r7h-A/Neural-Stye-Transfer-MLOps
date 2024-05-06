@@ -17,10 +17,17 @@ from src.utils.image_utils import imload, imsave
 from src.configs import config
 from botocore.exceptions import ClientError
 import urllib.request
+from apitally.fastapi import ApitallyMiddleware
 
 
 # Initialize FastAPI app
 app = FastAPI()
+
+app.add_middleware(
+    ApitallyMiddleware,
+    client_id="4915e518-d796-42a4-9889-d2ba3854098a",
+    env="prod",  # or "dev"
+)
 
 mlflow.set_tracking_uri("https://dagshub.com/shatter-star/musical-octo-dollop.mlflow")
 
