@@ -1,9 +1,9 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-south-2:873393246907:task-definition/app:7",
+    "taskDefinitionArn": "arn:aws:ecs:ap-south-2:873393246907:task-definition/app",
     "containerDefinitions": [
         {
             "name": "app",
-            "image": "873393246907.dkr.ecr.ap-south-2.amazonaws.com/app_repo",
+            "image": "873393246907.dkr.ecr.ap-south-2.amazonaws.com/app_repo:latest",
             "cpu": 2048,
             "memory": 8192,
             "portMappings": [
@@ -24,7 +24,7 @@
     "taskRoleArn": "arn:aws:iam::873393246907:role/ecsTaskExecutionRole",
     "executionRoleArn": "arn:aws:iam::873393246907:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 7,
+    "revision": 9,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -54,7 +54,7 @@
     ],
     "cpu": "2048",
     "memory": "8192",
-    "registeredAt": "2024-05-28T13:01:00.216Z",
+    "registeredAt": "2024-05-28T13:36:42.074Z",
     "registeredBy": "arn:aws:iam::873393246907:user/M86",
     "tags": []
 }
