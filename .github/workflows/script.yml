@@ -1,6 +1,8 @@
 name: Deploy to Amazon ECS
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - prod
 
 env:
   AWS_REGION: ap-south-2
