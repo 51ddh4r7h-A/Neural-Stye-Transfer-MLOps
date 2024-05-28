@@ -3,7 +3,7 @@
     "containerDefinitions": [
         {
             "name": "app",
-            "image": "873393246907.dkr.ecr.ap-south-2.amazonaws.com/app_repo:latest",
+            "image": "873393246907.dkr.ecr.ap-south-2.amazonaws.com/app_repo",
             "cpu": 2048,
             "memory": 8192,
             "portMappings": [
