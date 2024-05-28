@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - prod
-
 env:
   AWS_REGION: ap-south-2
   ECS_CLUSTER: app_cluster
@@ -24,7 +23,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}"
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
@@ -38,7 +37,7 @@ jobs:
           ECR_REPOSITORY: "app_repo"
           IMAGE_TAG: latest
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG backend/
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
@@ -56,4 +55,4 @@ jobs:
           task-definition: ${{ steps.task-def-1.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
+          wait-for-service-stability: false
