@@ -1,4 +1,4 @@
-name: Deploy to Amazon ECS CI/CD
+name: Deploy to Amazon ECS CI/CD Viva
 on:
   workflow_dispatch:
 env:
