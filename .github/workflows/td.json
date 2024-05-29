@@ -1,0 +1,59 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:ap-south-2:873393246907:task-definition/app",
+    "containerDefinitions": [
+        {
+            "name": "app",
+            "image": "873393246907.dkr.ecr.ap-south-2.amazonaws.com/app_repo",
+            "cpu": 2048,
+            "memory": 8192,
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "systemControls": []
+        }
+    ],
+    "family": "app",
+    "taskRoleArn": "arn:aws:iam::873393246907:role/ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::873393246907:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "2048",
+    "memory": "8192",
+    "registeredAt": "2024-05-29T04:15:03.522Z",
+    "registeredBy": "arn:aws:iam::873393246907:user/Mario",
+    "tags": []
+}
